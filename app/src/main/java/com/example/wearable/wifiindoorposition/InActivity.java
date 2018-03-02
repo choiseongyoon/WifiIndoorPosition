@@ -105,9 +105,9 @@ public class InActivity extends Calculate implements View.OnClickListener {
             @Override
             public void run() {
                 mainWifi.startScan();
-                position();
+                listadd();
             }
-        }, 1000);
+        }, 1);
 
     }
 
@@ -117,7 +117,7 @@ public class InActivity extends Calculate implements View.OnClickListener {
     protected void onResume() {
         registerReceiver(receiverWifi, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
         refresh();
-        position();
+ //       position();
         super.onResume();
     }
 
@@ -192,13 +192,54 @@ public class InActivity extends Calculate implements View.OnClickListener {
         });
     }
     //601
-    public void position() {
+    List<Integer> list_1 = new ArrayList<Integer>();
+    List<Integer> list_2 = new ArrayList<Integer>();
+    List<Integer> list_3 = new ArrayList<Integer>();
+
+    public void listadd() {
         int N = mainWifi.getScanResults().size();
         for(int i=0;i<N;i++) {
             if (mainWifi.getScanResults().get(i).BSSID.equals(wifi1_BSSID)) wifia_num = i;
             else if (mainWifi.getScanResults().get(i).BSSID.equals(wifi2_BSSID)) wifib_num = i;
             else if (mainWifi.getScanResults().get(i).BSSID.equals(wifi3_BSSID)) wific_num = i;}
+        list_1.add(mainWifi.getScanResults().get(wifia_num).level);
+        list_2.add(mainWifi.getScanResults().get(wifib_num).level);
+        list_3.add(mainWifi.getScanResults().get(wific_num).level);
+if(list_1.size()>0&&list_1.size()%5==0){
 
+    position();
+}
+    }
+    public int getAverage(ArrayList<Integer> list) {
+
+        int result=0;
+        int size=list.size();
+
+        for(Integer i : list) {
+
+            result += i;
+
+        }
+
+        return result/size;
+
+    }//end getSum()
+    public void position() {
+        Toast.makeText(getApplicationContext(),String.valueOf(list_1),Toast.LENGTH_LONG).show();
+
+        int level_1 = getAverage((ArrayList<Integer>) list_1);
+       int level_2 = getAverage((ArrayList<Integer>) list_2);
+        int level_3 = getAverage((ArrayList<Integer>) list_3);
+        d1=KalmanFileter(getDistance_float(KalmanFileter(mainWifi.getScanResults().get(wifia_num).frequency),KalmanFileter(level_1)));
+        d2=KalmanFileter(getDistance_float(KalmanFileter(mainWifi.getScanResults().get(wifib_num).frequency),KalmanFileter(level_2)));
+        d3=KalmanFileter(getDistance_float(KalmanFileter(mainWifi.getScanResults().get(wific_num).frequency),KalmanFileter(level_3 )));
+
+
+
+    //    d1=KalmanFileter(getDistance_float(KalmanFileter(mainWifi.getScanResults().get(wifia_num).frequency),KalmanFileter(mainWifi.getScanResults().get(wifia_num).level)));
+    //    d2=KalmanFileter(getDistance_float(KalmanFileter(mainWifi.getScanResults().get(wifib_num).frequency),KalmanFileter(mainWifi.getScanResults().get(wifib_num).level)));
+    //    d3=KalmanFileter(getDistance_float(KalmanFileter(mainWifi.getScanResults().get(wific_num).frequency),KalmanFileter(mainWifi.getScanResults().get(wific_num).level)));
+//
 /*
         d1=getDistance_float(mainWifi.getScanResults().get(wifia_num).frequency,  getrollingRssi(mainWifi.getScanResults().get(wifia_num).level));
         d2=getDistance_float(mainWifi.getScanResults().get(wifib_num).frequency,  getrollingRssi(mainWifi.getScanResults().get(wifib_num).level));
@@ -211,34 +252,37 @@ public class InActivity extends Calculate implements View.OnClickListener {
         tripty = (float) a[1];
 
 */
-/*
+
 
         if(mainWifi.getScanResults().get(wifia_num).level>=-16){d1=0.01;}
-        else if ((16>mainWifi.getScanResults().get(wifia_num).level)&&(mainWifi.getScanResults().get(wifia_num).level>=-45))
+        //else if ((-16>mainWifi.getScanResults().get(wifia_num).level)&&(mainWifi.getScanResults().get(wifia_num).level>=-45))
+        else
         {
-            d1=KalmanFileter(getDistance_float(KalmanFileter(mainWifi.getScanResults().get(wifia_num).frequency),KalmanFileter(mainWifi.getScanResults().get(wifia_num).level)));
+            //d1=KalmanFileter(getDistance_float(KalmanFileter(mainWifi.getScanResults().get(wifia_num).frequency),KalmanFileter(mainWifi.getScanResults().get(wifia_num).level)));
+            d1+=2.5;
         }
        // else {  d1=4.0;}
 
         if(mainWifi.getScanResults().get(wifib_num).level>=-16){d2=0.01;}
-        else if (-16>(mainWifi.getScanResults().get(wifib_num).level)&&(mainWifi.getScanResults().get(wifib_num).level>=-35))
+        else
+        //else if (-16>(mainWifi.getScanResults().get(wifib_num).level)&&(mainWifi.getScanResults().get(wifib_num).level>=-35))
         {
-            d2=KalmanFileter(getDistance_float(KalmanFileter(mainWifi.getScanResults().get(wifib_num).frequency),KalmanFileter(mainWifi.getScanResults().get(wifib_num).level)));
+           // d2=KalmanFileter(getDistance_float(KalmanFileter(mainWifi.getScanResults().get(wifib_num).frequency),KalmanFileter(mainWifi.getScanResults().get(wifib_num).level)));
+            d2+=1.0;
         }
         //else {  d2=3.0;}
 
         if(mainWifi.getScanResults().get(wific_num).level>=-16){d3=0.01;}
-        else if (-16>(mainWifi.getScanResults().get(wific_num).level)&&(mainWifi.getScanResults().get(wifia_num).level>=-40)){
-            d3=KalmanFileter(getDistance_float(KalmanFileter(mainWifi.getScanResults().get(wific_num).frequency),KalmanFileter(mainWifi.getScanResults().get(wific_num).level)));
+        else
+       // else if (-16>(mainWifi.getScanResults().get(wific_num).level)&&(mainWifi.getScanResults().get(wifia_num).level>=-40))
+        {
+          //  d3=KalmanFileter(getDistance_float(KalmanFileter(mainWifi.getScanResults().get(wific_num).frequency),KalmanFileter(mainWifi.getScanResults().get(wific_num).level)));
+       d3+=1.0;
         }
       //  else {  d3=2.0;}
 
 
-*/
-         d1=KalmanFileter(getDistance_float(KalmanFileter(mainWifi.getScanResults().get(wifia_num).frequency),KalmanFileter(mainWifi.getScanResults().get(wifia_num).level)))+3.5;
-        d2=KalmanFileter(getDistance_float(KalmanFileter(mainWifi.getScanResults().get(wifib_num).frequency),KalmanFileter(mainWifi.getScanResults().get(wifib_num).level)))+1.0;
-       d3=KalmanFileter(getDistance_float(KalmanFileter(mainWifi.getScanResults().get(wific_num).frequency),KalmanFileter(mainWifi.getScanResults().get(wific_num).level)))+1.5;
-
+        iv.setVisibility(View.VISIBLE);
      // d1=5.0;
      // d2=3.0;
   //    d3=2.0;
