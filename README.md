@@ -24,15 +24,12 @@ Wifi 를 통한 실내 위치 추정 어플리케이션
  - Listview Item 하나를 누르면 GraphActivity로 이동
 
 2. GraphActivity
- - Distance의 변화를 Graph로 표현
- - 0.7초 간격으로 스캔된 비콘의 거리 계산
- - 총 100번의 측정 결과를 그래프로 표시
- 
+ - Wifi의 Rssi와 Distance의 변화를 Graph로 표현
+
 3. InActivity
- - 0.6초 간격으로 Rssi값이 큰 3개의 Beacon을 스캔
+ - Rssi값이 큰 3개의 Wifi를 스캔
  - 삼변 측량을 통해 구해진 좌표값의 3번의 값을 평균값을 표시
- - 1.8초 간격으로 현재 위치 Update
- - Firebase에 각각의 user 폴더에  년-월-일 시:분:초로 세분화해서 저장
+ - 주기적으로 현재 위치 Update
 
 
 
